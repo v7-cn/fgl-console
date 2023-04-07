@@ -1,37 +1,17 @@
 # slht-fgl-lite
+* FGL 范式化建模语言开源轻量版
+# fgl 项目参考 
+https://e.gitee.com/slht/repos/slht/graphaidsl
 
-#### 介绍
-FGL 开源轻量版
+## 测试用例说明(examples)
+* test_data_topo 基于数据模型的 属性传导测试用例(当前平台支持，lite版需要废弃)  
+* test_data_graph 基于上传文件/内置图数据集的 属性传导测试用例(lite版的使用方法)   
+## 测试说明教程
+1. git submodule update --init  
+2. python3 -m pip install -r graphaidsl/fgl/requirements.txt    
+3. python3 examples/test_data_topo.py   
+4. python3 examples/test_data_graph.py   
 
-#### 软件架构
-软件架构说明
+## [平台的已经实现方案](http://117.34.72.185:12388/platform/label/task/create?id=canvas_apkw6zqu1x7ezknx&code=ICAgIC0tIOWIm%2BW7uuS4gOS4quiMg%2BW8jwogICAgQ1JFQVRFIE9SIFJFUExBQ0UgUEFSQURJR00gYXR0cmlidXRlX3RyYW5zZHVjdGl2ZShzY2hlbWEganNvbiwgc3BsaXRfY29uZmlnIGpzb24sIGdjbl9jb25maWcganNvbikKICAgIEJFR0lOCiAgICAgIFJVTiBEYXRhTW9kZWwgV0hFUkUgZGF0YW1vZGVsX2lkPSRzY2hlbWEuZGF0YW1vZGVsX2lkIEFORCB0b3BvPSRzY2hlbWEudG9wbyBBUyBkOwogICAgICBSVU4gZCBHcmVwb1NwbGl0IFdIRVJFIHNwbGl0X3JhdGU9JHNwbGl0X2NvbmZpZy5zcGxpdF9yYXRlIEFORCBub2RlX3R5cGU9JHNwbGl0X2NvbmZpZy5ub2RlX3R5cGUgQVMgczEsIHMyOwogICAgICBUUkFJTiBzMSBHcmVwb1JHQ04gV0hFUkUgbGFiZWw9JGdjbl9jb25maWcubGFiZWwgQU5EIGZlYXR1cmVzPSRnY25fY29uZmlnLmZlYXR1cmVzIEFORCBlZGdlX2xpc3Q9JGdjbl9jb25maWcuZWRnZV9saXN0IEFTIG07CiAgICAgIFJVTiBtLCBzMiBHcmVwb01vZGVsUHJlZGljdCBBUyB5X3ByZWQ7CiAgICAgIFJVTiB5X3ByZWQgTGFiZWxUYXNrQ2xhc3NpZnkgQVMgb3V0cHV0OwogICAgICBSRVRVUk4gb3V0cHV0OwogICAgRU5EOwogICAgLS0g6LCD55So5bGe5oCn5Lyg5a%2B86IyD5byPCiAgICBDQUxMIFBBUkFESUdNIGF0dHJpYnV0ZV90cmFuc2R1Y3RpdmUoewogICAgICAnZGF0YW1vZGVsX2lkJzogJ2Rtb2RlbF95bmNqeGFkdW51aWJpd3IxJywKICAgICAgJ3RvcG8nOiB7CiAgICAgICAgJ25vZGVfN3F2NHczZXp4NWJiMW42ZCc6ICdkc19lN3YwaWZ3aDRmN2szbXYwJywKICAgICAgICAnbm9kZV9xN2c5ZjNiOXNzdDZmNnRkJzogJ2RzX2FqYmtza2s2d2dtNWRybngnLAogICAgICAgICdub2RlX2trY3RwdDU5emltcXlqdWYnOiAnZHNfcDIyemYzd3JoZmNhNHg0ZycsCiAgICAgICAgJ25vZGVfNmF2Z2owYWdzZGExOGdmNyc6ICdkc180YzB5M2puaWM3M2c3YnR5JywKICAgICAgICAnbm9kZV9uajR0N3RidzNycm42amgzJzogJ2RzXzVjZHVtcDNwdGZicWg3Y2knLAogICAgICAgICdub2RlX2NueHlrcXp5N2lueWN5dTUnOiAnZHNfZWlhbWpteXF0ZjdjZG03MScsCiAgICAgICAgJ25vZGVfOXVxamV2dWlzYmY4Ymg0cyc6ICdkc19ncG56cWtuNDFhdjlhYW5xJywKICAgICAgICAnbm9kZV90YXBtdm44ZmhzaGI1dzF3JzogJ2RzX250ZmRjemc3cXJjM3J2MXMnCiAgICAgIH0KICAgIH0sCiAgICB7J3NwbGl0X3JhdGUnOjAuOCwgJ25vZGVfdHlwZSc6ICdjdXN0b21lcid9LAogICAgewogICAgICAnbGFiZWwnOiAnY3VzdG9tZXIubGFiZWwnLAogICAgICAnZmVhdHVyZXMnOiBbCiAgICAgICAgImN1c3RvbWVyLmdlbmRlciIsICJjdXN0b21lci5lbXBsb3llcl90eXBlIiwKICAgICAgICAiY3VzdG9tZXIuZWR1Y19sZXZlbCIsICJjdXN0b21lci5jb19tYW5hZ2VyX2ZsYWciLAogICAgICAgICJjdXN0b21lci5hY2N0X2JhbCIsICJjdXN0b21lci5pbmRpdmJhbmtfZmxhZyIsCiAgICAgICAgImNvbXBhbnkudHlwZSIsCiAgICAgICAgIm1lcmNoYW50LnR5cGUiLAogICAgICAgICJiYW5rb3V0X2N1c3RvbWVyLnR5cGUiCiAgICAgIF0sCiAgICAgIC0tIGVkZ2VfbGlzdAogICAgICAnZWRnZV9saXN0JzogWyJjb25zdW1fdHJhbnMiLCAiYmFua2luX3RyYW5zIiwgImludmVzdF90cmFucyIsICJiYW5rb3V0X3RyYW5zIl0KICAgIH0pIEFTIGM7) (供调试使用)  
 
-
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+![属性传导范式调用](./images/fgl_attribute_platform.png)
