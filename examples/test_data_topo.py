@@ -46,7 +46,7 @@ attribute_transductive = '''
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/../graphaidsl")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/../dsl")
 from fgl import FGL
 
 def execute_fgl(dag):

@@ -1,0 +1,478 @@
+{
+    "version": "1.0.0",
+    "canvas": {
+        "name": "hp-DSL测试",
+        "description": "hp-DSL测试",
+        "position": "ide"
+    },
+    "nodes": [
+        {
+            "id": "node_m4v5jerxfsx65s1p",
+            "name": "zc_test",
+            "module_id": "DataSet",
+            "isSchema": "1",
+            "schema_info": [
+                {
+                    "data_path": "/canvas/canvas_4wdchwbw917131rk/nodes/node_m4v5jerxfsx65s1p/port_0/data",
+                    "schema": {
+                        "columns": [
+                            "id",
+                            "gender",
+                            "birthdate",
+                            "employer_type",
+                            "educ_level",
+                            "co_manager_flag",
+                            "acct_bal",
+                            "indivbank_flag",
+                            "label"
+                        ],
+                        "types": [
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT"
+                        ],
+                        "alias": [
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            ""
+                        ]
+                    },
+                    "node_config": {
+                        "module": "dataset",
+                        "ds_id": "ds_ngqet1tcjkdsdt63",
+                        "col_map": {
+                            "id": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "id",
+                                "origin_type": "BIGINT"
+                            },
+                            "gender": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "gender",
+                                "origin_type": "BIGINT"
+                            },
+                            "birthdate": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "birthdate",
+                                "origin_type": "BIGINT"
+                            },
+                            "employer_type": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "employer_type",
+                                "origin_type": "BIGINT"
+                            },
+                            "educ_level": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "educ_level",
+                                "origin_type": "BIGINT"
+                            },
+                            "co_manager_flag": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "co_manager_flag",
+                                "origin_type": "BIGINT"
+                            },
+                            "acct_bal": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "acct_bal",
+                                "origin_type": "BIGINT"
+                            },
+                            "indivbank_flag": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "indivbank_flag",
+                                "origin_type": "BIGINT"
+                            },
+                            "label": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "label",
+                                "origin_type": "BIGINT"
+                            }
+                        }
+                    }
+                }
+            ],
+            "module_type": "DataSource",
+            "input_port_num": 0,
+            "input_ports": [],
+            "output_port_num": 1,
+            "output_ports": [
+                {
+                    "id": 0,
+                    "default": [],
+                    "label": "输出数据集",
+                    "port_type": "DataSet",
+                    "support_types": [
+                        "DataSet"
+                    ],
+                    "schema": {},
+                    "config": {},
+                    "reader": "",
+                    "writer": "",
+                    "isrequired": true
+                }
+            ],
+            "module_attrs": [
+                {
+                    "name": "ds_id",
+                    "value": "ds_ngqet1tcjkdsdt63",
+                    "default": "",
+                    "label": "数据集",
+                    "isdepand": false,
+                    "isupdate": true,
+                    "selected": {
+                        "type": "interface",
+                        "option": "dataset"
+                    }
+                }
+            ],
+            "resource_attrs": [
+                {
+                    "name": "max_cores",
+                    "type": "int",
+                    "value": 1,
+                    "default": 1,
+                    "label": "最大CPU数"
+                },
+                {
+                    "name": "driver_cores",
+                    "type": "int",
+                    "value": 1,
+                    "default": 1,
+                    "label": "Driver核数"
+                },
+                {
+                    "name": "driver_memory",
+                    "type": "string",
+                    "value": "1G",
+                    "default": "1G",
+                    "label": "Driver内存总量",
+                    "selected": {
+                        "type": "list",
+                        "option": [
+                            "1G",
+                            "2G",
+                            "4G",
+                            "8G",
+                            "16G",
+                            "32G"
+                        ]
+                    }
+                },
+                {
+                    "name": "executor_instances",
+                    "type": "int",
+                    "value": 1,
+                    "default": 1,
+                    "label": "Executor数量"
+                },
+                {
+                    "name": "executor_cores",
+                    "type": "int",
+                    "value": 1,
+                    "default": 1,
+                    "label": "Executor核数"
+                },
+                {
+                    "name": "executor_memory",
+                    "type": "int",
+                    "value": "1G",
+                    "default": "1G",
+                    "label": "Executor内存",
+                    "selected": {
+                        "type": "list",
+                        "option": [
+                            "1G",
+                            "2G",
+                            "4G",
+                            "8G",
+                            "16G",
+                            "32G"
+                        ]
+                    }
+                }
+            ],
+            "position_x": "420",
+            "position_y": "110"
+        },
+        {
+            "id": "node_n08ib8pvsdf2jb25",
+            "name": "归一化",
+            "module_id": "Normalization",
+            "isSchema": "1",
+            "schema_info": [
+                {
+                    "data_path": "/canvas/canvas_4wdchwbw917131rk/nodes/node_n08ib8pvsdf2jb25/port_0/data",
+                    "schema": {
+                        "columns": [
+                            "id",
+                            "gender",
+                            "birthdate",
+                            "employer_type",
+                            "educ_level",
+                            "co_manager_flag",
+                            "acct_bal",
+                            "indivbank_flag",
+                            "label"
+                        ],
+                        "types": [
+                            "BIGINT",
+                            "DOUBLE",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT",
+                            "BIGINT"
+                        ],
+                        "alias": [
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            ""
+                        ]
+                    },
+                    "node_config": {
+                        "module": "data_normalization",
+                        "normal_type": "maxmin",
+                        "cols": [
+                            "gender"
+                        ],
+                        "keep_original_col": false,
+                        "cols_stat": [
+                            {
+                                "gender": {
+                                    "min_value": 0,
+                                    "max_value": 1,
+                                    "mean_value": 0.49856,
+                                    "stddev_value": 0.5000004264
+                                }
+                            }
+                        ],
+                        "col_map": {
+                            "id": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "id",
+                                "origin_type": "BIGINT"
+                            },
+                            "gender": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "gender",
+                                "origin_type": "BIGINT"
+                            },
+                            "birthdate": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "birthdate",
+                                "origin_type": "BIGINT"
+                            },
+                            "employer_type": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "employer_type",
+                                "origin_type": "BIGINT"
+                            },
+                            "educ_level": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "educ_level",
+                                "origin_type": "BIGINT"
+                            },
+                            "co_manager_flag": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "co_manager_flag",
+                                "origin_type": "BIGINT"
+                            },
+                            "acct_bal": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "acct_bal",
+                                "origin_type": "BIGINT"
+                            },
+                            "indivbank_flag": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "indivbank_flag",
+                                "origin_type": "BIGINT"
+                            },
+                            "label": {
+                                "origin_node": "node_m4v5jerxfsx65s1p",
+                                "origin_col": "label",
+                                "origin_type": "BIGINT"
+                            }
+                        }
+                    }
+                }
+            ],
+            "module_type": "FeatureEngineering",
+            "input_port_num": 1,
+            "input_ports": [
+                {
+                    "id": 0,
+                    "default": [],
+                    "label": "输入数据集",
+                    "port_type": "DataSet",
+                    "support_types": [
+                        "DataSet"
+                    ],
+                    "schema": {},
+                    "config": {},
+                    "reader": "",
+                    "writer": "",
+                    "isrequired": true
+                }
+            ],
+            "output_port_num": 1,
+            "output_ports": [
+                {
+                    "id": 0,
+                    "default": [],
+                    "label": "输出数据集",
+                    "port_type": "DataSet",
+                    "support_types": [
+                        "DataSet"
+                    ],
+                    "schema": {},
+                    "config": {},
+                    "reader": "",
+                    "writer": "",
+                    "isrequired": true
+                }
+            ],
+            "module_attrs": [
+                {
+                    "name": "cols",
+                    "value": [
+                        "gender"
+                    ],
+                    "default": [],
+                    "label": "选择列",
+                    "isdepand": true,
+                    "isupdate": true,
+                    "selected": {
+                        "type": "interface",
+                        "option": "schema"
+                    }
+                },
+                {
+                    "name": "normal_type",
+                    "value": "maxmin",
+                    "default": "maxmin",
+                    "label": "归一化方式",
+                    "isdepand": false,
+                    "isupdate": false,
+                    "selected": {
+                        "type": "list",
+                        "option": [
+                            "maxmin",
+                            "zscore",
+                            "lognormal"
+                        ]
+                    }
+                },
+                {
+                    "name": "keep_original_col",
+                    "value": false,
+                    "default": false,
+                    "label": "是否保留原始列",
+                    "isdepand": false,
+                    "isupdate": true,
+                    "selected": {
+                        "type": "list",
+                        "option": [
+                            false,
+                            true
+                        ]
+                    }
+                }
+            ],
+            "resource_attrs": [
+                {
+                    "name": "max_cores",
+                    "type": "int",
+                    "value": 1,
+                    "default": 1,
+                    "label": "最大CPU数"
+                },
+                {
+                    "name": "driver_cores",
+                    "type": "int",
+                    "value": 1,
+                    "default": 1,
+                    "label": "Driver核数"
+                },
+                {
+                    "name": "driver_memory",
+                    "type": "string",
+                    "value": "1G",
+                    "default": "1G",
+                    "label": "Driver内存总量",
+                    "selected": {
+                        "type": "list",
+                        "option": [
+                            "1G",
+                            "2G",
+                            "4G",
+                            "8G",
+                            "16G",
+                            "32G"
+                        ]
+                    }
+                },
+                {
+                    "name": "executor_instances",
+                    "type": "int",
+                    "value": 1,
+                    "default": 1,
+                    "label": "Executor数量"
+                },
+                {
+                    "name": "executor_cores",
+                    "type": "int",
+                    "value": 1,
+                    "default": 1,
+                    "label": "Executor核数"
+                },
+                {
+                    "name": "executor_memory",
+                    "type": "int",
+                    "value": "1G",
+                    "default": "1G",
+                    "label": "Executor内存",
+                    "selected": {
+                        "type": "list",
+                        "option": [
+                            "1G",
+                            "2G",
+                            "4G",
+                            "8G",
+                            "16G",
+                            "32G"
+                        ]
+                    }
+                }
+            ],
+            "position_x": "420",
+            "position_y": "210"
+        }
+    ],
+    "edges": [
+        {
+            "source": "node_m4v5jerxfsx65s1p",
+            "target": "node_n08ib8pvsdf2jb25",
+            "source_port": "0",
+            "target_port": "0"
+        }
+    ]
+}
