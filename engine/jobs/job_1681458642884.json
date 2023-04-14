@@ -1,0 +1,85 @@
+{
+    "version": "1.0.0",
+    "canvas": {
+        "name": "DSL-autogen-24270eb6e23a2f6afa96ef6ba864d624",
+        "description": "该DAG任务由 FGL 解析器生成",
+        "position": "dsl"
+    },
+    "nodes": [
+        {
+            "id": "node_92e50c26",
+            "name": "图数据集",
+            "module_id": "GraphRepo",
+            "node_attrs": {
+                "name": "Cora",
+                "module": "graphrepo"
+            }
+        },
+        {
+            "id": "node_a753ad55",
+            "name": "GCN二分类",
+            "module_id": "GrepoGCN",
+            "node_attrs": {
+                "epoch": 1000,
+                "lr": 0.001,
+                "label": "abc",
+                "label_mask": [],
+                "features": [],
+                "layers": [
+                    50
+                ],
+                "automl": false,
+                "automl_trials": 4,
+                "module": "grepo_gcn_model"
+            }
+        },
+        {
+            "id": "node_ba9fc185",
+            "name": "图模型预测",
+            "module_id": "GrepoModelPredict",
+            "node_attrs": {
+                "module": "grepo_model_predict"
+            }
+        },
+        {
+            "id": "node_47701cd6",
+            "name": "图二分类评估",
+            "module_id": "GrepoEvalTwoClassify",
+            "node_attrs": {
+                "module": "grepo_eval_2_classify"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "source": "node_92e50c26",
+            "target": "node_a753ad55",
+            "source_port": 0,
+            "target_port": 0
+        },
+        {
+            "source": "node_92e50c26",
+            "target": "node_ba9fc185",
+            "source_port": 0,
+            "target_port": 1
+        },
+        {
+            "source": "node_92e50c26",
+            "target": "node_47701cd6",
+            "source_port": 0,
+            "target_port": 0
+        },
+        {
+            "source": "node_a753ad55",
+            "target": "node_ba9fc185",
+            "source_port": 0,
+            "target_port": 0
+        },
+        {
+            "source": "node_ba9fc185",
+            "target": "node_47701cd6",
+            "source_port": 0,
+            "target_port": 1
+        }
+    ]
+}

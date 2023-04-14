@@ -136,3 +136,13 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+
+Cora
+_dsl
+_examples
+main.js
+test.fglnb
+test.ipynb
+data
+fgl.sh

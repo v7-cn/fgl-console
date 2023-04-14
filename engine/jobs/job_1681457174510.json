@@ -1,0 +1,85 @@
+{
+    "version": "1.0.0",
+    "canvas": {
+        "name": "DSL-autogen-f4326d05838975e91a8b4bec2594c115",
+        "description": "该DAG任务由 FGL 解析器生成",
+        "position": "dsl"
+    },
+    "nodes": [
+        {
+            "id": "node_24fd6f61",
+            "name": "图数据集",
+            "module_id": "GraphRepo",
+            "node_attrs": {
+                "name": "Cora",
+                "module": "graphrepo"
+            }
+        },
+        {
+            "id": "node_406311a3",
+            "name": "GCN二分类",
+            "module_id": "GrepoGCN",
+            "node_attrs": {
+                "epoch": 500,
+                "lr": 0.001,
+                "label": "abc",
+                "label_mask": [],
+                "features": [],
+                "layers": [
+                    50
+                ],
+                "automl": false,
+                "automl_trials": 4,
+                "module": "grepo_gcn_model"
+            }
+        },
+        {
+            "id": "node_8428dc4b",
+            "name": "图模型预测",
+            "module_id": "GrepoModelPredict",
+            "node_attrs": {
+                "module": "grepo_model_predict"
+            }
+        },
+        {
+            "id": "node_21346f47",
+            "name": "图二分类评估",
+            "module_id": "GrepoEvalTwoClassify",
+            "node_attrs": {
+                "module": "grepo_eval_2_classify"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "source": "node_24fd6f61",
+            "target": "node_406311a3",
+            "source_port": 0,
+            "target_port": 0
+        },
+        {
+            "source": "node_24fd6f61",
+            "target": "node_8428dc4b",
+            "source_port": 0,
+            "target_port": 1
+        },
+        {
+            "source": "node_24fd6f61",
+            "target": "node_21346f47",
+            "source_port": 0,
+            "target_port": 0
+        },
+        {
+            "source": "node_406311a3",
+            "target": "node_8428dc4b",
+            "source_port": 0,
+            "target_port": 0
+        },
+        {
+            "source": "node_8428dc4b",
+            "target": "node_21346f47",
+            "source_port": 0,
+            "target_port": 1
+        }
+    ]
+}
