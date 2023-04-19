@@ -28,19 +28,19 @@ test:
 		fgl -c "TRAIN PARADIGM attribute_transduction WHERE name='Cora' AND automl=true AND trials=10 AND output='model'"
 	@echo "属性传导范式[预测]"
 	docker run -v ${PWD}:/data -it fglite \
-		fgl -c "PREDICT PARADIGM attribute_transduction WHERE name='Cora' model='model' AND output='classes.txt'"
+		fgl -c "PREDICT PARADIGM attribute_transduction WHERE name='Cora' AND  model='model' AND output='classes.txt'"
 	@echo "向量化匹配范式[训练]"
 	docker run -v ${PWD}:/data -it fglite \
 		fgl -c "TRAIN PARADIGM vector_matching WHERE name='./data/cora.json' AND automl=true AND trials=10 AND output='model'"
 	@echo "向量化匹配范式[预测]"
 	docker run -v ${PWD}:/data -it fglite \
-		fgl -c "PREDICT PARADIGM vector_matching WHERE name='./data/cora.json' model='model' AND output='embedding.txt'"
+		fgl -c "PREDICT PARADIGM vector_matching WHERE name='./data/cora.json' AND  model='model' AND output='embedding.txt'"
 	@echo "时序图演进范式[训练]"
 	docker run -v ${PWD}:/data -it fglite \
 		fgl -c "TRAIN PARADIGM temporal_evolution WHERE name='chickenpox' AND automl=true AND trials=10 AND output='model'"
 	@echo "时序图演进范式[训练]"
 	docker run -v ${PWD}:/预测 -it fglite \
-		fgl -c "PREDICT PARADIGM temporal_evolution WHERE name='./data/chickenpox.json' model='model' AND output='temporal.txt'"
+		fgl -c "PREDICT PARADIGM temporal_evolution WHERE name='./data/chickenpox.json' AND  model='model' AND output='temporal.txt'"
 
 # 语法覆盖测试
 coverage:

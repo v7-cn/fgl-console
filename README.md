@@ -41,19 +41,19 @@ docker run -v $PWD:/data -it fglite ```fgl -s examples/paradigm.fgl```
     * 训练 
     > ```TRAIN PARADIGM attribute_transduction WHERE name='Cora' AND automl=true AND trials=10 AND output='model'```
     * 预测  
-    > ```PREDICT PARADIGM attribute_transduction WHERE name='Cora' model='model' AND output='classes.txt'```
+    > ```PREDICT PARADIGM attribute_transduction WHERE name='Cora' AND model='model' AND output='classes.txt'```
 
 * 向量化匹配范式
     * 训练 
     > ```TRAIN PARADIGM vector_matching WHERE name='./data/cora.json' AND automl=true AND trials=10 AND output='model'```
     * 预测  
-    > ```PREDICT PARADIGM vector_matching WHERE name='./data/cora.json' model='model' AND output='embedding.txt'```
+    > ```PREDICT PARADIGM vector_matching WHERE name='./data/cora.json' AND model='model' AND output='embedding.txt'```
 
 * 时序图范式
     * 训练 
     > ```TRAIN PARADIGM temporal_evolution WHERE name='chickenpox' AND automl=true AND trials=10 AND output='model'```
     * 预测  
-    > ```PREDICT PARADIGM temporal_evolution WHERE name='./data/chickenpox.json' model='model' AND output='temporal.txt'```
+    > ```PREDICT PARADIGM temporal_evolution WHERE name='./data/chickenpox.json' AND model='model' AND output='temporal.txt'```
 
 # 贡献
 描述如何参与项目开发，包括：
