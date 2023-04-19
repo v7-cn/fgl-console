@@ -74,6 +74,7 @@ def _interpreter(
                                     context,
                                     extra=return_status(
                                         'error', message='debug content xxx'))
+        # 该dag执行会改变meta
         yield None, {'reference_change': res.get('reference_change', False)}
     # python 模式
     elif mode in ['python']:

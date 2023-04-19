@@ -1,4 +1,4 @@
-# Generated from FGL.g4 by ANTLR 4.11.1
+# Generated from fgl/FGL.g4 by ANTLR 4.12.0
 from antlr4 import *
 if __name__ is not None and "." in __name__:
     from .FGLParser import FGLParser
@@ -116,6 +116,11 @@ class FGLVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by FGLParser#conditionOp.
     def visitConditionOp(self, ctx:FGLParser.ConditionOpContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by FGLParser#contextKey.
+    def visitContextKey(self, ctx:FGLParser.ContextKeyContext):
         return self.visitChildren(ctx)
 
 

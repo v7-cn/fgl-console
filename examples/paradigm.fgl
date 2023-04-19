@@ -1,0 +1,58 @@
+// #########################################
+// 属性传导范式[训练过程]
+CREATE PARADIGM.TRAIN attribute_transduction(name str, automl bool, trials int, output str)
+BEGIN
+        RUN GraphRepo WHERE name=$name as d;
+        TRAIN d GrepoGCN WHERE automl=$automl AND epoch=10 AND automl_trials=$trials AND output=$output AS m;
+END;
+
+// 属性传导范式[预测过程]
+CREATE PARADIGM.PREDICT attribute_transduction(name str, model str, output str)
+BEGIN
+        RUN GraphRepo WHERE name=$name as d;
+        RUN _, d GrepoModelPredict WHERE model=$model AND output=$output AS y_pred;
+END;
+
+
+// #########################################
+// 向量化匹配范式[训练过程]
+CREATE PARADIGM.TRAIN vector_matching(name str, automl bool, trials int, output str)
+BEGIN
+        RUN GraphRepo WHERE name=$name as d;
+        TRAIN d GrepoRecommend WHERE automl=$automl AND epoch=10 AND automl_trials=$trials AND output=$output AS m;
+END;
+
+// 向量化匹配范式[预测]
+CREATE PARADIGM.PREDICT vector_matching(name str, model str, output str)
+BEGIN
+        RUN GraphRepo WHERE name=$name as d;
+        RUN _, d GrepoRecommendPredict  WHERE model=$model and output=$output AS y_pred;
+END;
+
+// #########################################
+// 时序图演进范式[预测]
+CREATE PARADIGM.TRAIN temporal_evolution(name str, automl bool, trials int, output str)
+BEGIN
+        RUN GraphRepo WHERE name=$name and temporal=true as d;
+        TRAIN d GrepoEGCN WHERE automl=True AND automl_trials=$trials AND epoch=10 AND output=$output AS m;
+END;
+
+// 时序图演进范式[预测]
+CREATE PARADIGM.PREDICT temporal_evolution(name str, model str, output str)
+BEGIN
+        RUN GraphRepo WHERE name=$name and temporal=true as d;
+        RUN _, d MlEvalRegressor WHERE model=$model AND output=$output AS y_pred;
+END;
+
+
+// TRAIN PARADIGM attribute_transductive('Cora', true, 10, 'model');
+// TRAIN PARADIGM attribute_transduction WHERE name='Cora' AND automl=true AND trials=10 AND output='model';
+// PREDICT PARADIGM attribute_transductive('Cora', 'model', 'classes.txt');
+
+// TRAIN PARADIGM vector_matching('Cora', true, 10, 'model');
+// PREDICT PARADIGM vector_matching('Cora', 'model', 'embedding.txt');
+
+TRAIN PARADIGM temporal_evolution('./data/chickenpox.json', true, 10, 'model');
+// PREDICT PARADIGM temporal_evolution('chickenpox', 'model', 'temporal.txt');
+
+

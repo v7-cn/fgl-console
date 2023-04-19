@@ -4,8 +4,8 @@ from fgl import FGL
 from fgl.support.exceptions import DSLException
 import unittest
 
-def print(*args, **kwargs):
-    pass
+# def print(*args, **kwargs):
+#     pass
 
 class ParadigmTestCase(unittest.TestCase):
     '''范式
@@ -19,6 +19,9 @@ class ParadigmTestCase(unittest.TestCase):
     def test_1_paradigm_show(self):
         print(FGL().parse("SHOW PARADIGMS")['output'])
         print(FGL().parse("SHOW PARADIGM test_temp")['output'])
+        # print("AA:", FGL().parse("SHOW PARADIGM attribute_transductive")['output'])
+        # import pdb 
+        # pdb.set_trace()
 
     def test_2_paradigm_call(self):
         pass

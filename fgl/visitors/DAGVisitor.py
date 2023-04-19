@@ -51,7 +51,8 @@ class DAGVisitor(FGLVisitor):
         edges = []
         for iden, ports in link_couple.items():
             # assert len(ports['out']) <= 1, f"Variable {iden} product by {len(ports['out'])} nodes"
-
+            if iden == '_':
+                continue
             if len(ports['in']) > 0:
                 assert len(
                     ports['out']) > 0, f'Variable {iden} used but not declared'

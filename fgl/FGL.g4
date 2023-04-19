@@ -46,14 +46,14 @@ setArguments: WHERE setArgument*;
 setArgument: (parameter checkOp expr AND?);
 conditions: WHERE (expr checkOp expr conditionOp?)*;
 macro_key: (PARADIGM | DATAMODEL | JOB);
-call: CALL macro_key? macro_name argument (AS identifier)?;
+call: (CALL|TRAIN|PREDICT) macro_key? macro_name argument? setArguments? (AS identifier)?;
 ret: RETURN expr;
 module: IDENTIFIER;
 checkOp: '=' | '!=' | '==';
 conditionOp: AND | OR;
-
+contextKey: '.'(CALL|TRAIN|PREDICT);
 createParadigm:
-	CREATE (OR REPLACE)? PARADIGM IDENTIFIER argument_typing begin_block;
+	CREATE (OR REPLACE)? PARADIGM contextKey? IDENTIFIER argument_typing begin_block;
 
 createDatamodel:
 	CREATE (OR REPLACE)? DATAMODEL IDENTIFIER argument_typing begin_block;
@@ -90,14 +90,15 @@ array: '[' (constant ',')* (constant)? ']';
 constant: (NUMBER | STRING_LITERAL | BOOLEAN | json | array);
 // Ignore Case 
 
+fragment DOT: '.';
 fragment DIGIT: [0-9];
 fragment LETTER: [a-zA-Z];
 fragment DQUOTA_STRING:
-	'"' ('\\' . | '""' | ~('"' | '\\'))* '"';
+	'"' ('\\' .  | '""' | ~('"' | '\\'))* '"';
 fragment SQUOTA_STRING:
-	'\'' ('\\' . | '\'\'' | ~('\'' | '\\'))* '\'';
+	'\'' ('\\' .  | '\'\'' | ~('\'' | '\\'))* '\'';
 fragment BQUOTA_STRING:
-	'`' ('\\' . | '``' | ~('`' | '\\'))* '`';
+	'`' ('\\' .  | '``' | ~('`' | '\\'))* '`';
 fragment FALSE: 'false' | 'FALSE' | 'False';
 fragment TRUE: 'true' | 'TRUE' | 'True';
 
@@ -165,6 +166,8 @@ TYPING:
 	| 'int'
 	| 'number'
 	| 'float'
+	| 'bool'
+	| 'boolean'
 	| 'json'
 	| 'array';
 NUMBER: (DIGIT|'.')+;

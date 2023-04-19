@@ -1,4 +1,4 @@
-# Generated from FGL.g4 by ANTLR 4.11.1
+# Generated from fgl/FGL.g4 by ANTLR 4.12.0
 from antlr4 import *
 if __name__ is not None and "." in __name__:
     from .FGLParser import FGLParser
@@ -203,6 +203,15 @@ class FGLListener(ParseTreeListener):
 
     # Exit a parse tree produced by FGLParser#conditionOp.
     def exitConditionOp(self, ctx:FGLParser.ConditionOpContext):
+        pass
+
+
+    # Enter a parse tree produced by FGLParser#contextKey.
+    def enterContextKey(self, ctx:FGLParser.ContextKeyContext):
+        pass
+
+    # Exit a parse tree produced by FGLParser#contextKey.
+    def exitContextKey(self, ctx:FGLParser.ContextKeyContext):
         pass
 
 

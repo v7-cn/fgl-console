@@ -356,6 +356,11 @@ module_configs = {
         "name": "属性传导评估",
         "module": "label_task_classify",
         "module_id": "LabelTaskClassify"
+    },
+    "grepoegcn": {
+        "name": "EGCN二分类",
+        "module": "grepo_egcn_model",
+        "module_id": "GrepoEGCN"
     }
 }
 

@@ -1,3 +1,4 @@
+      
 import time
 from dagster import DependencyDefinition, GraphDefinition, NodeInvocation, op, Field, In
 import torch
@@ -13,17 +14,21 @@ import optuna
 from copy import deepcopy
 from sklearn import metrics
 from tabulate import tabulate
+from torch_geometric.utils import negative_sampling
+from torch_geometric.nn import GCNConv
+import torch
+import torch.nn.functional as F
 from libs.utils import summary_model
 
- 
+
 def _fetch_default_params(trial):
     return {'optim': trial.suggest_categorical('optim', ['Adam', 'SGD']),
             'lr': trial.suggest_float('lr', 1e-20, 1e-1),
             'weight_decay': trial.suggest_float('weight_decay', 1e-20, 1e-3)
             }
-           
-    
-class GCN(torch.nn.Module):
+        
+        
+class EmbeddingGCN(torch.nn.Module):
         def __init__(self, num_node_features, num_classes):
             super().__init__()
             self.conv1 = GCNConv(num_node_features, 16)
@@ -35,11 +40,12 @@ class GCN(torch.nn.Module):
             x = F.relu(x)
             x = F.dropout(x, training=self.training)
             x = self.conv2(x, edge_index)
-            return F.log_softmax(x, dim=1)
+            return x
         
-
-
-@op(config_schema={"epoch":Field(int, default_value=500, is_required=False, description="训练轮数"),
+        
+@op(config_schema={"metapath": Field(list, default_value=[], description="正样本路径"),
+                    "neg_metapath": Field(list, default_value=[], description="负样本路径"),
+                    "epoch":Field(int, default_value=500, is_required=False, description="训练轮数"),
                    "lr":Field(float, default_value=0.001, is_required=False, description="学习率"),
                    "optim":Field(str, default_value='Adam', is_required=False, description="优化器"),
                    "weight_decay":Field(float, default_value=1e-20, is_required=False, description="正则"),
@@ -51,37 +57,47 @@ class GCN(torch.nn.Module):
                    "label_mask":Field(list, default_value=[], is_required=False, description="是否对label遮挡"),
                    "output":Field(str, default_value='', is_required=False, description="模型输出路径")
                    })
-def grepo_gcn_model(context, dataset:Dataset)->dict:
-    '''训练模型    
-    :param dataset: 数据集      
-    :param epoch: 训练轮数      
-    :return state_dict: 模型参数     
-    '''  
+def grepo_recommend_model(context, dataset: Dataset)->Any:   
+    '''图算法组件      
+    :param in0_grepo: 输入图数据集      
+    :return out0_gmodel: 输出图模型         
+    '''    
     epoch = context.op_config.get('epoch', None)
-    # model train
     def train_model(trial):
         params = _fetch_default_params(trial)
-        optim = getattr(torch.optim, params.get('optim', None))
         lr = params.get('lr', None)
         weight_decay = params.get('weight_decay', None)
         
+        data = dataset[0]
+        pos_edges = data.edge_index
+        neg_edges = negative_sampling(edge_index=data.edge_index, 
+                        num_nodes=data.x.shape[0], 
+                        num_neg_samples=data.edge_index.shape[1])
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        model = GCN(dataset.num_node_features, dataset.num_classes).to(device)
-        data = dataset[0].to(device)
-        optimizer = optim(model.parameters(), lr=lr, weight_decay=weight_decay)
-
-        model.train()
-        for e in tqdm(range(epoch)):
+        model = EmbeddingGCN(dataset.num_node_features, dataset.num_classes).to(device)
+        data.to(device)
+        
+        from tqdm import tqdm
+        from torch import optim
+        tbar = tqdm(range(epoch))
+        optimizer = getattr(torch.optim, params.get('optim', None))(model.parameters(), lr=lr, weight_decay=weight_decay)
+        for e in tbar:
+            embeddings = model(data)
+            pos_loss = F.cosine_embedding_loss(embeddings[pos_edges[0]], embeddings[pos_edges[1]], torch.ones(pos_edges.shape[1]).to(device))
+            neg_loss = F.cosine_embedding_loss(embeddings[neg_edges[0]], embeddings[neg_edges[1]], torch.zeros(neg_edges.shape[1]).to(device))
+            loss = pos_loss + neg_loss
+            tbar.set_postfix(loss=loss.item())
             optimizer.zero_grad()
-            out = model(data)
-            loss = F.nll_loss(out[data.train_mask], data.y[data.train_mask])
             trial.report(loss.item(), e)
             if trial.should_prune():
                 raise optuna.TrialPruned()
             loss.backward()
             optimizer.step()
-            
-        y_true, y_pred = data.y.cpu().detach().numpy(), out.cpu().detach().numpy().argmax(axis=1)
+        embeddings = model(data)
+        y_pred = torch.concat([(embeddings[pos_edges[0]] * embeddings[pos_edges[1]]).sum(axis=1),
+                              (embeddings[neg_edges[0]] * embeddings[neg_edges[1]]).sum(axis=1)]).detach().cpu().numpy() > 0.5
+        y_true = torch.concat([torch.ones(pos_edges.shape[1]).to(device),
+                               torch.zeros(neg_edges.shape[1]).to(device)]).detach().cpu().numpy()
         trial.set_user_attr('model', model)
         trial.set_user_attr('eval', {"模型评估":{
             'F值':metrics.f1_score(y_true, y_pred, average='macro'),
@@ -106,7 +122,6 @@ def grepo_gcn_model(context, dataset:Dataset)->dict:
         study = optuna.create_study(direction="maximize")
         study.optimize(train_model, n_jobs=1, n_trials=context.op_config.get('automl_trials', None))
     model = study.best_trial.user_attrs['model']
-    
     # dump best model
     metadata = deepcopy(study.best_params)
     metadata.update(summary_model(model))
@@ -114,7 +129,7 @@ def grepo_gcn_model(context, dataset:Dataset)->dict:
 
     context.log_event(
         AssetMaterialization(
-            asset_key="rgnn_model", description="Persisted result to storage", metadata=metadata
+            asset_key="sage_model", description="Persisted result to storage", metadata=metadata
         )
     )
     
@@ -135,45 +150,41 @@ def grepo_gcn_model(context, dataset:Dataset)->dict:
         torch.save(model, f"{output}/model.pth")
         open(f"{output}/reporter.json", "w").write(json.dumps(metadata, indent=4, ensure_ascii=False))
         open(f"{output}/trials.txt", "w").write(tb)
-    
-
-    return model.state_dict()
+    return model.state_dict() 
 
 
-    
+
 @op(config_schema={"model":Field(str, is_required=False, description="模型输出路径"),
                    "output":Field(str, is_required=False, description="预测结果输出路径")})
-def grepo_model_predict(context, state_dict:Any, dataset:Dataset)->np.ndarray:
-    '''评估预测  
-    :param state_dict: 模型参数  
-    :param dataset: 测试数据集  
-    :return acc: 预测准确度  
-    '''
-    
+def grepo_recommend_predict(context, state_dict:Any, dataset:Dataset)->Any:   
+    '''预测组件      
+    :param state_dict: 输入图模型      
+    :param dataset: 输入图数据集      
+    '''  
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     modelpath = context.op_config.get('model', None)
     if modelpath:
         model = torch.load(f"{modelpath}/model.pth")
     else:
-        model = GCN(dataset.num_node_features, dataset.num_classes).to(device)
+        model = model = EmbeddingGCN(dataset.num_node_features, dataset.num_classes).to(device)
         model.load_state_dict(state_dict)
         
     data = dataset[0].to(device)
-    pred = model(data).argmax(dim=1)
-    correct = (pred[data.test_mask] == data.y[data.test_mask]).sum()
-    acc = int(correct) / int(data.test_mask.sum())
+    pos_edges = data.edge_index
+    neg_edges = negative_sampling(edge_index=data.edge_index, 
+                num_nodes=data.x.shape[0], 
+                num_neg_samples=data.edge_index.shape[1])
+    embeddings = model(data)
+
+    y_pred = torch.concat([(embeddings[pos_edges[0]] * embeddings[pos_edges[1]]).sum(axis=1),
+                            (embeddings[neg_edges[0]] * embeddings[neg_edges[1]]).sum(axis=1)]).detach().cpu().numpy() > 0.5
+    y_true = torch.concat([torch.ones(pos_edges.shape[1]).to(device),
+                            torch.zeros(neg_edges.shape[1]).to(device)]).detach().cpu().numpy()
+    f1 = metrics.f1_score(y_true, y_pred, average='macro')
+    
     outputpath = context.op_config.get('output', None)
     if outputpath:
-        open(outputpath, "w").write("\n".join([f"{i},{p}" for i, p in enumerate(pred.tolist())]))
-    return pred.detach().cpu().numpy()
-
-
-@op
-def grepo_eval_2_classify(dataset, y)->int:
-    '''图模型二分类评估  
-    :param dataset: 数据集  
-    :return y: 预测标签  
-    '''
-    return sum(y).item() - sum(dataset[0].y).item()
-
-
+        import pandas as pd
+        pd.DataFrame(embeddings.detach().cpu().numpy().tolist()).to_csv(outputpath, index=None, header=None)
+    return f1
+    

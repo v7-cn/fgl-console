@@ -60,21 +60,7 @@ def grepo_rsage_model(context, in0_grepo: Grepo)->Any:
     return None  
     
 
-@op(config_schema={"epoch": Field(int, default_value=100, description="训练epoch"),
-                    "lr": Field(float, default_value=0.001, description="学习率"),
-                    "metapath": Field(list, default_value=[], description="正样本路径"),
-                    "neg_metapath": Field(list, default_value=[], description="负样本路径"),
-                    "features": Field(list, default_value=[], description="特征列"),
-                    "output_dim": Field(int, default_value=16, description="输出向量维度"),
-                    "layers": Field(list, default_value=[50], description="隐藏层节点数"),
-                    "automl": Field(bool, default_value=False, description="是否自动化训练"),
-                    "automl_trials": Field(int, default_value=4, description="创建模型数量")})
-def grepo_recommend_model(context, in0_grepo: Grepo)->Any:   
-    '''图算法组件      
-    :param in0_grepo: 输入图数据集      
-    :return out0_gmodel: 输出图模型         
-    '''    
-    return None  
+
     
 
 @op(config_schema={"graph": Field(dict, default_value={}, description="因果图"),

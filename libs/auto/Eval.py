@@ -27,11 +27,11 @@ def ml_eval_classify(context, in0_dataset: DataSet)->Any:
     return None  
     
 
-@op(config_schema={})
-def ml_eval_regressor(context, in0_dataset: DataSet)->Any:   
-    '''评估组件      
-    :param in0_dataset: 输入数据集      
-    :return out0_eval: 输出评估结果         
-    '''    
-    return None  
+# @op(config_schema={})
+# def ml_eval_regressor(context, in0_dataset: DataSet)->Any:   
+#     '''评估组件      
+#     :param in0_dataset: 输入数据集      
+#     :return out0_eval: 输出评估结果         
+#     '''    
+#     return None  
     

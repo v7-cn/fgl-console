@@ -86,9 +86,12 @@ class DDLVisitor(FGLVisitor):
             if ctx.setArguments() is not None:
                 for a in ctx.setArguments().setArgument():
                     arguments[a.parameter().getText()] = a.expr().getText()
-
-        # pdb.set_trace()        
-        kvdb()[f'{KEY}_{name}'] = {
+        
+        if hasattr(ctx, 'contextKey'):
+            sub_macro = ctx.contextKey().getText().upper()
+        else:
+            sub_macro = ""
+        kvdb()[f'{KEY}{sub_macro}_{name}'] = {
             'parameters': args,
             'origin_sql': origin_sql,
             'block_content': block_content,

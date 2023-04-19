@@ -1,3 +1,4 @@
+      
 import time
 from dagster import DependencyDefinition, GraphDefinition, NodeInvocation, op, Field, In
 import torch
@@ -13,32 +14,32 @@ import optuna
 from copy import deepcopy
 from sklearn import metrics
 from tabulate import tabulate
+from torch_geometric.utils import negative_sampling
+from torch_geometric.nn import GCNConv
+import torch
+import torch.nn.functional as F
+from torch_geometric_temporal.nn.recurrent import EvolveGCNH
 from libs.utils import summary_model
 
- 
+# from libs.utils import _fetch_default_params
 def _fetch_default_params(trial):
     return {'optim': trial.suggest_categorical('optim', ['Adam', 'SGD']),
             'lr': trial.suggest_float('lr', 1e-20, 1e-1),
             'weight_decay': trial.suggest_float('weight_decay', 1e-20, 1e-3)
             }
-           
-    
-class GCN(torch.nn.Module):
-        def __init__(self, num_node_features, num_classes):
-            super().__init__()
-            self.conv1 = GCNConv(num_node_features, 16)
-            self.conv2 = GCNConv(16, num_classes)
+     
+class RecurrentGCN(torch.nn.Module):
+    def __init__(self, node_count, node_features, out_channels=1):
+        super(RecurrentGCN, self).__init__()
+        self.recurrent = EvolveGCNH(node_count, node_features)
+        self.linear = torch.nn.Linear(node_features, out_channels)
 
-        def forward(self, data):
-            x, edge_index = data.x, data.edge_index
-            x = self.conv1(x, edge_index)
-            x = F.relu(x)
-            x = F.dropout(x, training=self.training)
-            x = self.conv2(x, edge_index)
-            return F.log_softmax(x, dim=1)
+    def forward(self, x, edge_index, edge_weight):
+        h = self.recurrent(x, edge_index, edge_weight)
+        h = F.relu(h)
+        h = self.linear(h)
+        return h   
         
-
-
 @op(config_schema={"epoch":Field(int, default_value=500, is_required=False, description="训练轮数"),
                    "lr":Field(float, default_value=0.001, is_required=False, description="学习率"),
                    "optim":Field(str, default_value='Adam', is_required=False, description="优化器"),
@@ -51,49 +52,41 @@ class GCN(torch.nn.Module):
                    "label_mask":Field(list, default_value=[], is_required=False, description="是否对label遮挡"),
                    "output":Field(str, default_value='', is_required=False, description="模型输出路径")
                    })
-def grepo_gcn_model(context, dataset:Dataset)->dict:
-    '''训练模型    
-    :param dataset: 数据集      
-    :param epoch: 训练轮数      
-    :return state_dict: 模型参数     
-    '''  
+def grepo_egcn_model(context, dataset)->Any:   
+    '''图算法组件      
+    :param in0_grepo: 输入图数据集      
+    :return out0_gmodel: 输出图模型         
+    '''    
+    
     epoch = context.op_config.get('epoch', None)
-    # model train
     def train_model(trial):
         params = _fetch_default_params(trial)
         optim = getattr(torch.optim, params.get('optim', None))
         lr = params.get('lr', None)
         weight_decay = params.get('weight_decay', None)
         
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        model = GCN(dataset.num_node_features, dataset.num_classes).to(device)
-        data = dataset[0].to(device)
-        optimizer = optim(model.parameters(), lr=lr, weight_decay=weight_decay)
-
+        
+        model = RecurrentGCN(node_features = 4, node_count = 20)
+        optimizer = optim(model.parameters(), lr=weight_decay, weight_decay=weight_decay)
         model.train()
-        for e in tqdm(range(epoch)):
-            optimizer.zero_grad()
-            out = model(data)
-            loss = F.nll_loss(out[data.train_mask], data.y[data.train_mask])
-            trial.report(loss.item(), e)
-            if trial.should_prune():
-                raise optuna.TrialPruned()
-            loss.backward()
+        tbar = tqdm(range(epoch))
+        for e in tbar:
+            cost = 0
+            for time, snapshot in enumerate(dataset):
+                y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+                cost = cost + torch.mean((y_hat-snapshot.y)**2)
+            cost = cost / (time+1)
+            tbar.set_postfix(loss=cost.item())
+            cost.backward()
             optimizer.step()
-            
-        y_true, y_pred = data.y.cpu().detach().numpy(), out.cpu().detach().numpy().argmax(axis=1)
+            optimizer.zero_grad()
         trial.set_user_attr('model', model)
         trial.set_user_attr('eval', {"模型评估":{
-            'F值':metrics.f1_score(y_true, y_pred, average='macro'),
-            '准确度':metrics.accuracy_score(y_true, y_pred),
-            '召回率':metrics.recall_score(y_true, y_pred, average='macro'),
-            '精准度': metrics.precision_score(y_true, y_pred, average='macro')
+            'MSE值':cost.item()
         }})
-        f1 = metrics.f1_score(y_true, y_pred, average='macro')
-        return f1
-    
+        return cost.item()
     # find best model
-    study = optuna.create_study(direction="maximize", pruner=optuna.pruners.NopPruner())
+    study = optuna.create_study(direction="minimize", pruner=optuna.pruners.NopPruner())
     if not context.op_config.get('automl', False):
         study.enqueue_trial({
             "lr": context.op_config.get('lr', None),
@@ -103,10 +96,9 @@ def grepo_gcn_model(context, dataset:Dataset)->dict:
         )
         study.optimize(train_model, n_jobs=1, n_trials=1)
     else:
-        study = optuna.create_study(direction="maximize")
+        study = optuna.create_study(direction="minimize")
         study.optimize(train_model, n_jobs=1, n_trials=context.op_config.get('automl_trials', None))
     model = study.best_trial.user_attrs['model']
-    
     # dump best model
     metadata = deepcopy(study.best_params)
     metadata.update(summary_model(model))
@@ -114,7 +106,7 @@ def grepo_gcn_model(context, dataset:Dataset)->dict:
 
     context.log_event(
         AssetMaterialization(
-            asset_key="rgnn_model", description="Persisted result to storage", metadata=metadata
+            asset_key="sage_model", description="Persisted result to storage", metadata=metadata
         )
     )
     
@@ -135,15 +127,13 @@ def grepo_gcn_model(context, dataset:Dataset)->dict:
         torch.save(model, f"{output}/model.pth")
         open(f"{output}/reporter.json", "w").write(json.dumps(metadata, indent=4, ensure_ascii=False))
         open(f"{output}/trials.txt", "w").write(tb)
-    
-
     return model.state_dict()
-
+    
 
     
 @op(config_schema={"model":Field(str, is_required=False, description="模型输出路径"),
                    "output":Field(str, is_required=False, description="预测结果输出路径")})
-def grepo_model_predict(context, state_dict:Any, dataset:Dataset)->np.ndarray:
+def ml_eval_regressor(context, state_dict:Any, dataset:Any)->float:
     '''评估预测  
     :param state_dict: 模型参数  
     :param dataset: 测试数据集  
@@ -155,25 +145,16 @@ def grepo_model_predict(context, state_dict:Any, dataset:Dataset)->np.ndarray:
     if modelpath:
         model = torch.load(f"{modelpath}/model.pth")
     else:
-        model = GCN(dataset.num_node_features, dataset.num_classes).to(device)
+        model = RecurrentGCN(node_features = 4, node_count = 20)
         model.load_state_dict(state_dict)
-        
-    data = dataset[0].to(device)
-    pred = model(data).argmax(dim=1)
-    correct = (pred[data.test_mask] == data.y[data.test_mask]).sum()
-    acc = int(correct) / int(data.test_mask.sum())
+    y_hats = []
+    cost = 0
+    for time, snapshot in enumerate(dataset):
+        y_hat = model(snapshot.x, snapshot.edge_index, snapshot.edge_attr)
+        cost = cost + torch.mean((y_hat-snapshot.y)**2)
+        y_hats.append(y_hat.flatten().detach().numpy())
+    cost = cost / (time+1)
     outputpath = context.op_config.get('output', None)
     if outputpath:
-        open(outputpath, "w").write("\n".join([f"{i},{p}" for i, p in enumerate(pred.tolist())]))
-    return pred.detach().cpu().numpy()
-
-
-@op
-def grepo_eval_2_classify(dataset, y)->int:
-    '''图模型二分类评估  
-    :param dataset: 数据集  
-    :return y: 预测标签  
-    '''
-    return sum(y).item() - sum(dataset[0].y).item()
-
-
+        open(outputpath, "w").write("\n".join([f"{i}|{str(y_hat.tolist())}" for i, y_hat in enumerate(y_hats)]))
+    return cost.item()

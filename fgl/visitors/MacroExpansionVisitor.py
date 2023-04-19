@@ -38,7 +38,7 @@ class VariableMapperVisitor(FGLVisitor):
                        enumerate(content_with_index)))[0][0]
             rr = [(None, c) for c in (self.output_identifier if (
                 v == self.output_identifier_replaced and self.
-                output_identifier is not None) else f'{stack_lable}{v}')]
+                output_identifier is not None) else ('_' if v == '_' else f'{stack_lable}{v}'))]
             content_with_index = content_with_index[:
                                                     sn] + rr + content_with_index[
                                                         en:]
@@ -87,6 +87,7 @@ class MacroExpansionVisitor(FGLVisitor):
             content = content[:s] + c + content[e + 1:]
         for k,v in self.ipt_replacement.items():
             content = content.replace(k, v)
+        # print(content)
         # return 'asfasfds'
         return content
 
@@ -134,6 +135,12 @@ class MacroExpansionVisitor(FGLVisitor):
             if hasattr(ctx, key) and getattr(ctx, key)():
                 return key
             
+    def _getCallKey(self, ctx):
+        for c in ['CALL', "TRAIN", "PREDICT"]:
+            if hasattr(ctx, c) and getattr(ctx, c)() is not None:
+                return c
+        return ""
+        
     # Visit a parse tree produced by FGLParser#call.
     def visitCall(self, ctx: FGLParser.CallContext):
         ids = ctx.identifier()
@@ -142,27 +149,50 @@ class MacroExpansionVisitor(FGLVisitor):
         # pdb.set_trace()
         output_identifier = None if ctx.identifier() is None else ctx.identifier().getText()
         # args = [e.getText() for e in ctx.argument().expr()]
-        args = ctx.argument().expr()
-        # pdb.set_trace()
+        
+        callKey = self._getCallKey(ctx)
         try:
-            macro = kvdb()[f'{key}_{dname}']
+            try:
+                macro = kvdb()[f'{key}.{callKey}_{dname}']
+            except:
+                macro = kvdb()[f'{key}_{dname}']
         except KeyError:
             raise DSLException(f"{key} {dname} not defined")
         content = macro['block_content']
         # pdb.set_trace()
-        for (n, t), a in zip(macro['parameters'], args):
+        # params
+        
+        param_type = {n:t for n, t in macro['parameters']}
+        
+        arguments = {}
+        
+        for (n, t), a in zip(macro['parameters'],  [] if ctx.argument() is None else ctx.argument().expr()):
+            arguments[n] = (t, a)
+        if ctx.setArguments() is not None:
+            for arg in ctx.setArguments().setArgument():
+                n, a = arg.parameter().getText(), arg.expr()
+                t = param_type[n]
+                arguments[n] = (t, a)
+                
+        for n, (t, a) in arguments.items():
             v = a.getText()
+            def str_wrap(v):
+                if type(v) is str:
+                    return f"'{v}'"
+                return str(v)
             try:
-                v =  str(value2py(v))
+                v =  value2py(v)
             except:
                 pass
             # content = content.replace(f"${n}", v)
             if t.lower() == 'json':
                 # pdb.set_trace()
                 for sl, con in zip(a.constant().json().STRING_LITERAL(), a.constant().json().constant()):
-                    self.ipt_replacement[f"${n}.{sl.getText()[1:-1]}"] = con.getText()
+                    self.ipt_replacement[f"${n}.{sl.getText()[1:-1]}"] = str_wrap(con.getText())
             else:
-                self.ipt_replacement[f"${n}"] = v
+                self.ipt_replacement[f"${n}"] = str_wrap(v)
+                
+        # print(self.ipt_replacement)
         # pdb.set_trace()
         content = visit(VariableMapperVisitor(output_identifier), content, ignore_parse_error=True)
         # pdb.set_trace()

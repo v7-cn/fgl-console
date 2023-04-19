@@ -71,8 +71,10 @@ def dot2svg(src):
    return rt.pipe(format='svg').decode('utf8')
     
 def value2py(v):
-    if type(v) is str and len(v) >= 2 and v[0] == '`' and v[-1] == '`':
+    if type(v) is str and len(v) >= 2 and v[0] in ['`', '\''] and v[-1] in ['`', '\'']:
         v = f"'{v[1:-1]}'"
+        # print("##IN:", v)
+        # return v
     # v = ''.join(v.split())
     if v == 'false':
         v = 'False'

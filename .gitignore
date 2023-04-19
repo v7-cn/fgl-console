@@ -144,6 +144,13 @@ _examples
 main.js
 test.fglnb
 test.ipynb
-data
+#data
 fgl.sh
 engine/jobs
+*.txt
+*.ipynb
+data/*/
+!data/*.json
+fgl/data
+model/
+output/

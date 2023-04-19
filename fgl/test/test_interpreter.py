@@ -14,7 +14,7 @@ def interpreter(*args, **kwargs)->typing.Any:
 
 stats = '''
          // 创建一个范式
-        CREATE OR REPLACE PARADIGM attribute_transductive(schema  json, split_config json)
+        CREATE OR REPLACE PARADIGM attribute_transductive2(schema  json, split_config json)
         BEGIN
         RUN DataModel WHERE schema=$schema.did AND topo=$schema.topo AS d;
         RUN d GrepoSplit WHERE rate=$split_config.rate AS s1, s2;
@@ -24,7 +24,7 @@ stats = '''
         RETURN output;
         END;
         // 调用属性传导范式
-        CALL PARADIGM attribute_transductive({'did': 'did', 'topo':{'n1':'d1', 'n2':'d2'}}, {'rate':0.8}) AS c;
+        CALL PARADIGM attribute_transductive2({'did': 'did', 'topo':{'n1':'d1', 'n2':'d2'}}, {'rate':0.8}) AS c;
                     '''
 class InterpreterTestCase(unittest.TestCase):
     
