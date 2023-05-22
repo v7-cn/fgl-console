@@ -7,8 +7,7 @@ import optuna
 import os
             
  
- 
- 
+
 sql = '''
 CREATE OR REPLACE PARADIGM attribute_transductive(schema  json, split_config json)
         BEGIN
@@ -24,7 +23,14 @@ CREATE OR REPLACE PARADIGM attribute_transductive(schema  json, split_config jso
 # @click.group()
 # def fgl():
     # ...
-   
+    
+def execute_fgl(fgl, debug=False):
+    from engine.engine import fgljobs
+    r = FGL().parse_dag(fgl)
+    dag = json.loads(r)
+    fgljobs([dag])[0].execute_in_process(run_config={'loggers':{'console':{'config':{'log_level':'DEBUG' if debug else 'ERROR'}}}})
+    return ""
+    
 @click.command()
 @click.option("-c", '--command', default=None, help='命令行')
 @click.option("-d", '--debug', default=False, is_flag=True, help='调试模式')

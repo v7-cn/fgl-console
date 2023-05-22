@@ -1,6 +1,7 @@
-# slht-fgl-lite
+# slht-fgl-console
 # FGL
-Formalized Graph AI Language（缩写：**FGL**）是由Graph AI标准化范式驱动的声明式业务智能应用开发语言
+Formalized Graph AI Language（缩写：**FGL**）是由Graph AI标准化范式驱动的声明式业务智能应用开发语言  
+![FGL交互终端](images/fgl_console.png)  
 
 **FGL项目的目标**：一行代码实现业务化图神经网络模型搭建。
 > CV与NLP飞速发展大大加速了AGI，然而在**海量业务决策**问题中真正需要的是思考**事物和事物之间的关系**，这就意味着必须利用Graph AI相关技术才能有效帮助AI厘清事物间关系做出有效决策。    
@@ -24,11 +25,8 @@ Formalized Graph AI Language（缩写：**FGL**）是由Graph AI标准化范式�
 
 # 使用
 ## 特性
-* 执行命令  
-docker run -v $PWD:/data -it fglite ```fgl -c "{FGL}"```
-
-* 执行fgl脚本  
-docker run -v $PWD:/data -it fglite ```fgl -s examples/paradigm.fgl```
+* 启动交互终端      
+docker run -v $PWD:/data -it fglite python3 cli.py
 
 * automl支持
 
@@ -36,7 +34,7 @@ docker run -v $PWD:/data -it fglite ```fgl -s examples/paradigm.fgl```
 
 ## 范式
 * 执行命令  
-    > docker run -v $PWD:/data -it fglite ```fgl -c "{FGL}"```
+    > docker run --gpus all -v $PWD:/data -it fglite ```python3 cli.py```
 * 属性传导范式
     * 训练 
     > ```TRAIN PARADIGM attribute_transduction WHERE name='Cora' AND automl=true AND trials=10 AND output='model'```

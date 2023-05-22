@@ -1,4 +1,8 @@
 .PHONY:fgl lsp interpreter engine 
+
+source:
+	@echo source /data3t/ty010/bin/activate
+    
 # fgl command init
 alias:
 	@echo 'alias fgl="python3 -m interpreter.cli"'
@@ -38,8 +42,8 @@ test:
 	@echo "时序图演进范式[训练]"
 	docker run -v ${PWD}:/data -it fglite \
 		fgl -c "TRAIN PARADIGM temporal_evolution WHERE name='chickenpox' AND automl=true AND trials=10 AND output='model'"
-	@echo "时序图演进范式[训练]"
-	docker run -v ${PWD}:/预测 -it fglite \
+	@echo "时序图演进范式[预测]"
+	docker run -v ${PWD}:/data -it fglite \
 		fgl -c "PREDICT PARADIGM temporal_evolution WHERE name='./data/chickenpox.json' AND  model='model' AND output='temporal.txt'"
 
 # 语法覆盖测试

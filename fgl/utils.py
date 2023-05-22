@@ -115,7 +115,8 @@ class DSLErrorListener(ErrorListener):
         pass
 
     def syntaxError(self, recog, symbol, line, col, msg, e):
-        logging.info("PARSE ERROR:")
+        return 
+        logging.info("** PARSE ERROR: **")
         logging.warning(recog, symbol, line, col, msg, e)
         # fmt = "%s\n%s\n%s"
         # marker = "~" * col + "^"
